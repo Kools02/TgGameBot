@@ -1,53 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Click the Button Game</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      margin-top: 50px;
-    }
-    button {
-      font-size: 20px;
-      padding: 10px 20px;
-    }
-    #score {
-      font-size: 24px;
-      margin-top: 20px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fetch SMS</title>
 </head>
 <body>
-  <h1>Click the Button!</h1>
-  <button id="clickButton">Click Me!</button>
-  <div id="score">Score: 0</div>
-  <script>
-    let score = 0;
-    const button = document.getElementById('clickButton');
-    const scoreDisplay = document.getElementById('score');
+    <h1>Fetch SMS Response</h1>
+    <button id="fetchButton">Fetch SMS</button>
+    <div id="responseArea" style="margin-top: 20px; padding: 10px; border: 1px solid #ccc;">
+        <strong>Response will appear here:</strong>
+    </div>
 
-    button.addEventListener('click', () => {
-      score++;
-      scoreDisplay.textContent = `Score: ${score}`;
-    });
+    <script>
+        // URL for the API
+        const url = "http://172.25.203.91/goip_get_sms.html?username=root&password=root";
 
-    // End the game after 10 seconds
-    setTimeout(() => {
-      button.disabled = true;
-      alert(`Game Over! Your final score is ${score}`);
-      // Send score back to Telegram
-      const queryId = new URLSearchParams(window.location.search).get('tgWebAppData');
-      if (queryId) {
-        fetch(`https://your-server.com/score`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ queryId, score }),
-        });
-      }
-    }, 10000);
-  </script>
+        // Function to fetch data from the URL
+        async function fetchSMS() {
+            const responseArea = document.getElementById("responseArea");
+
+            try {
+                // Fetch the data
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP Error: ${response.status}`);
+                }
+
+                // Parse the response text
+                const data = await response.text();
+
+                // Display the response in the responseArea
+                responseArea.innerHTML = `<pre>${data}</pre>`;
+            } catch (error) {
+                // Display error message
+                responseArea.innerHTML = `<span style="color: red;">Error: ${error.message}</span>`;
+            }
+        }
+
+        // Add event listener to the button
+        document.getElementById("fetchButton").addEventListener("click", fetchSMS);
+    </script>
 </body>
 </html>
